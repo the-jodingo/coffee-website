@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aroma | Premium Coffee</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CSS Variables & Reset --- */
+        :root {
+            --primary: #4e342e; /* Dark Coffee */
+            --accent: #d7ccc8; /* Cream */
+            --highlight: #ffab91; /* Warm Orange */
+            --bg-light: #f5f5f5;
+            --text-dark: #2c2c2c;
+            --transition: 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        /* --- Components --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 35px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: var(--transition);
+            border: 2px solid var(--primary);
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: transparent;
+            color: var(--primary);
+        }
+
+        /* --- Header & Nav --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+            transition: var(--transition);
+            padding: 15px 0;
+        }
+
+        header.scrolled {
+            padding: 10px 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--highlight);
+        }
+
+        /* Mobile Menu Toggle */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .bar {
+            width: 25px;
+            height: 3px;
+            background-color: var(--primary);
+            transition: 0.3s;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(to right, #fdfbf7 50%, #f3e5f5 50%);
+            padding-top: 80px;
+        }
+
+        .hero .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hero-text {
+            flex: 1;
+            padding-right: 50px;
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+            max-width: 450px;
+        }
+
+        .hero-img {
+            flex: 1;
+        }
+
+        .hero-img img {
+            border-radius: 50% 50% 0 0;
+            width: 400px;
+            height: 400px;
+            object-fit: cover;
+            margin: 0 auto;
+            box-shadow: 20px 20px 0 var(--accent);
+        }
+
+        /* --- Menu Section (Dynamic) --- */
+        .menu-section {
+            padding: 80px 0;
+            background-color: white;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            color: var(--primary);
+        }
+
+        /* Grid container for JS injection */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* JS Generated Card Style */
+        .coffee-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: var(--transition);
+            opacity: 0; /* Hidden initially for animation */
+            transform: translateY(20px);
+        }
+
+        .coffee-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .coffee-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-img {
+            height: 250px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+        .coffee-card:hover .card-img img {
+            transform: scale(1.1);
+        }
+
+        .card-content {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .card-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .card-content .price {
+            display: inline-block;
+            background-color: var(--accent);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .card-content p {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .card-content .add-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .card-content .add-btn:hover {
+            background-color: var(--highlight);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 50px 0 20px;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            margin-left: 20px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .hero {
+                background: linear-gradient(to bottom, #fdfbf7 60%, #f3e5f5 40%);
+                height: auto;
+                padding-bottom: 50px;
+            }
+            .hero .container {
+                flex-direction: column-reverse;
+                text-align: center;
+            }
+            .hero-text { padding-right: 0; padding-top: 30px; }
+            .hero-text h1 { font-size: 2.5rem; }
+            .hero-img img { width: 250px; height: 250px; }
+            
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background: white;
+                padding: 20px;
+                box-shadow: 0 10px 10px rgba(0,0,0,0.1);
+            }
+            .nav-links.active { display: flex; }
+            .hamburger { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <header id="navbar">
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">Aroma.</a>
+                <div class="hamburger" id="hamburger">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-text">
+                <h1>Start your morning with pure happiness.</h1>
+                <p>Artisanal coffee beans roasted to perfection. Sourced from the best growers and delivered fresh to your cup.</p>
+                <a href="#menu" class="btn">View Menu</a>
+            </div>
+            <div class="hero-img">
+                <img src="https://picsum.photos/seed/coffee1/400/400" alt="Coffee Cup">
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="menu-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Favorites</h2>
+                <p>Select from our range of hand-crafted beverages.</p>
+            </div>
+            
+            <!-- JavaScript will inject coffee cards here -->
+            <div id="menu-grid" class="menu-grid"></div>
+            
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">Aroma.</div>
+                <div class="footer-links">
+                    <a href="#">Instagram</a>
+                    <a href="#">Twitter</a>
+                    <a href="#">Facebook</a>
+                </div>
+            </div>
+            <p>&copy; 2023 Aroma Coffee. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. DATA SOURCE
+        // This array simulates a database response.
+        const coffeeData = [
+            {
+                name: "Espresso",
+                price: "$3.50",
+                description: "A strong, concentrated coffee with a rich, golden crema.",
+                image: "https://picsum.photos/seed/espresso/400/300"
+            },
+            {
+                name: "Cappuccino",
+                price: "$4.50",
+                description: "Espresso with steamed milk and a thick layer of foam.",
+                image: "https://picsum.photos/seed/cappuccino/400/300"
+            },
+            {
+                name: "Caramel Macchiato",
+                price: "$5.00",
+                description: "Espresso with vanilla syrup, milk, and caramel drizzle.",
+                image: "https://picsum.photos/seed/macchiato/400/300"
+            },
+            {
+                name: "Cold Brew",
+                price: "$4.75",
+                description: "Slow-steeped for 12 hours for a smooth, bold flavor.",
+                image: "https://picsum.photos/seed/coldbrew/400/300"
+            },
+            {
+                name: "Mocha",
+                price: "$5.25",
+                description: "Rich chocolate mixed with espresso and topped with whipped cream.",
+                image: "https://picsum.photos/seed/mocha/400/300"
+            },
+            {
+                name: "Affogato",
+                price: "$4.00",
+                description: "A scoop of vanilla ice cream drowned in a shot of hot espresso.",
+                image: "https://picsum.photos/seed/affogato/400/300"
+            }
+        ];
+
+        // 2. DOM MANIPULATION
+        const menuGrid = document.getElementById('menu-grid');
+
+        // Function to render the menu cards
+        function renderMenu() {
+            menuGrid.innerHTML = coffeeData.map((item, index) => {
+                return `
+                    <div class="coffee-card" style="transition-delay: ${index * 100}ms">
+                        <div class="card-img">
+                            <img src="${item.image}" alt="${item.name}">
+                        </div>
+                        <div class="card-content">
+                            <h3>${item.name}</h3>
+                            <span class="price">${item.price}</span>
+                            <p>${item.description}</p>
+                            <button class="add-btn" onclick="addToOrder('${item.name}')">Add to Order</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Trigger animation after elements are added to DOM
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.coffee-card');
+                cards.forEach(card => card.classList.add('visible'));
+            }, 100);
+        }
+
+        // Simple interaction function
+        function addToOrder(coffeeName) {
+            // In a real app, this would add to a shopping cart
+            const btn = event.target;
+            const originalText = btn.innerText;
+            
+            btn.innerText = "Added!";
+            btn.style.backgroundColor = "#4CAF50"; // Green color
+            btn.style.color = "white";
+
+            // Reset button after 1 second
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.backgroundColor = ""; // Reset to CSS default
+                btn.style.color = "";
+            }, 1000);
+        }
+
+        // 3. NAVBAR SCROLL EFFECT
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            header.classList.toggle('scrolled', window.scrollY > 0);
+        });
+
+        // 4. MOBILE MENU TOGGLE
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('nav-links');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Close mobile menu when a link is clicked
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', renderMenu);
+
+    </script>
+</body>
+</html>
